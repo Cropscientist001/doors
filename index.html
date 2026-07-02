@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cox Interiors — Door Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Karla:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5EFE4;
+    --surface:#FFFDF8;
+    --border:#DFD3BC;
+    --border-strong:#C9B896;
+    --ink:#26190E;
+    --ink-soft:#5C4A35;
+    --ink-faint:#8C7A62;
+    --brass:#8F621F;
+    --brass-deep:#6E4A14;
+    --brass-tint:#F3E6CB;
+    --radius:6px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Karla',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;cursor:pointer}
+
+  header{
+    background:var(--ink);color:#F3EBDD;padding:0 28px;height:64px;
+    display:flex;align-items:center;justify-content:space-between;
+    border-bottom:3px solid var(--brass);
+  }
+  .wordmark{display:flex;align-items:baseline;gap:14px}
+  .wordmark h1{font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:.02em}
+  .wordmark h1 span{color:#D9A94F}
+  .wordmark .sub{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#B9A783}
+  .demo-badge{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:1px solid #574327;color:#D9A94F;padding:5px 12px;border-radius:999px}
+
+  .app{display:grid;grid-template-columns:330px minmax(0,1fr) 330px;min-height:calc(100vh - 64px - 46px)}
+  @media(max-width:1120px){
+    .app{grid-template-columns:300px minmax(0,1fr)}
+    .rail-right{grid-column:1 / -1;border-top:1px solid var(--border);border-left:none}
+  }
+  @media(max-width:760px){
+    .app{grid-template-columns:1fr}
+    .rail-left{border-right:none;border-bottom:1px solid var(--border)}
+    .stage{min-height:540px}
+  }
+
+  .rail-left{background:var(--surface);border-right:1px solid var(--border);padding:22px 22px 40px;overflow-y:auto}
+  .step{margin-bottom:26px}
+  .step-label{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+  .step-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--brass);letter-spacing:.1em;font-weight:600}
+  .step-label h3{font-family:'Fraunces',serif;font-weight:600;font-size:16px}
+  .step-hint{font-size:12.5px;color:var(--ink-faint);margin:-6px 0 10px;padding-left:34px}
+
+  .chip-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .chip{
+    border:1px solid var(--border);background:var(--surface);border-radius:var(--radius);
+    padding:9px 10px;text-align:left;font-size:13px;font-weight:500;color:var(--ink-soft);
+    transition:border-color .15s ease-out, background .15s ease-out;
+  }
+  .chip:hover{border-color:var(--border-strong)}
+  .chip.active{border-color:var(--brass);background:var(--brass-tint);color:var(--ink);box-shadow:inset 0 0 0 1px var(--brass)}
+  .chip:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+  .chip .code{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-faint);margin-top:2px;letter-spacing:.06em}
+  .chip.active .code{color:var(--brass-deep)}
+  .chip:disabled{opacity:.4;cursor:not-allowed}
+
+  .swatch-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .swatch{
+    border:1px solid var(--border);border-radius:var(--radius);padding:5px;background:var(--surface);
+    display:flex;flex-direction:column;gap:5px;transition:border-color .15s ease-out;
+  }
+  .swatch:hover{border-color:var(--border-strong)}
+  .swatch.active{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass)}
+  .swatch:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+  .swatch .wood{height:34px;border-radius:3px;border:1px solid rgba(0,0,0,.12)}
+  .swatch .name{font-size:10.5px;font-weight:600;color:var(--ink-soft);text-align:center;line-height:1.2}
+  .swatch.active .name{color:var(--ink)}
+
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  select{
+    width:100%;appearance:none;border:1px solid var(--border);border-radius:var(--radius);
+    background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235C4A35' fill='none' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 10px center;
+    padding:9px 28px 9px 10px;font-size:13px;font-weight:500;color:var(--ink);font-family:'Karla',sans-serif;
+  }
+  select:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
+  .field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:5px}
+
+  .stage{
+    position:relative;display:flex;align-items:center;justify-content:center;padding:36px 24px;
+    background:
+      radial-gradient(ellipse 75% 60% at 50% 40%, #FCF7EC 0%, var(--paper) 70%);
+    overflow:hidden;
+  }
+  .stage::before{
+    content:"";position:absolute;inset:auto 0 0 0;height:36%;
+    background:linear-gradient(180deg, transparent, rgba(94,72,44,.08));pointer-events:none;
+  }
+  .stage canvas{max-width:100%;height:auto;display:block}
+  .stage-tag{
+    position:absolute;top:18px;left:24px;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);
+  }
+  .stage-tag b{color:var(--ink);font-weight:600}
+
+  .rail-right{background:var(--surface);border-left:1px solid var(--border);padding:22px;overflow-y:auto;display:flex;flex-direction:column;gap:18px}
+  .ticket{border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface);overflow:hidden}
+  .ticket-head{background:var(--ink);color:#EFE6D4;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+  .ticket-head .t{font-family:'Fraunces',serif;font-size:15px;font-weight:600}
+  .ticket-head .sku{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#D9A94F;letter-spacing:.08em}
+  .ticket-body{padding:14px 16px}
+  .spec-row{display:flex;justify-content:space-between;gap:12px;padding:6.5px 0;border-bottom:1px dashed var(--border);font-size:13px}
+  .spec-row:last-child{border-bottom:none}
+  .spec-row .k{color:var(--ink-faint)}
+  .spec-row .v{font-weight:600;text-align:right}
+  .price-line{display:flex;justify-content:space-between;align-items:baseline;padding:14px 16px;border-top:1px solid var(--border);background:var(--brass-tint)}
+  .price-line .k{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass-deep)}
+  .price-line .v{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600}
+  .lead{font-size:12px;color:var(--ink-faint);padding:0 16px 12px;background:var(--brass-tint)}
+
+  .btn-primary{
+    width:100%;border:none;border-radius:var(--radius);background:var(--brass);color:#FFF9EE;
+    font-size:14px;font-weight:700;letter-spacing:.02em;padding:12px;transition:background .15s ease-out;
+  }
+  .btn-primary:hover{background:var(--brass-deep)}
+  .btn-primary:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+  .quote h4{font-family:'Fraunces',serif;font-size:16px;font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline}
+  .quote h4 .count{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);font-weight:400}
+  .quote-empty{border:1px dashed var(--border-strong);border-radius:var(--radius);padding:18px 14px;font-size:12.5px;color:var(--ink-faint);text-align:center}
+  .quote-item{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;margin-bottom:7px;background:var(--surface)}
+  .quote-item .qi-sku{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.04em}
+  .quote-item .qi-desc{font-size:11.5px;color:var(--ink-faint)}
+  .quote-item .qi-price{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;white-space:nowrap}
+  .qi-remove{border:none;background:none;color:var(--ink-faint);font-size:16px;line-height:1;padding:2px 4px;border-radius:3px}
+  .qi-remove:hover{color:#9A3B2B}
+  .quote-total{display:flex;justify-content:space-between;align-items:baseline;border-top:2px solid var(--ink);padding-top:10px;margin-top:10px;display:none}
+  .quote-total .k{font-weight:700;font-size:13px}
+  .quote-total .v{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600}
+
+  footer{
+    height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;
+    border-top:1px solid var(--border);background:var(--surface);
+    font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:.06em;
+  }
+  footer .ff{color:var(--ink-soft)}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">
+    <h1>COX <span>INTERIORS</span></h1>
+    <div class="sub">Door Studio</div>
+  </div>
+  <div class="demo-badge">Concept Demo · v0.2</div>
+</header>
+
+<div class="app">
+
+  <aside class="rail-left" aria-label="Door configurator">
+    <div class="step">
+      <div class="step-label"><span class="step-num">01</span><h3>Door style</h3></div>
+      <div class="chip-grid" id="styleGrid"></div>
+    </div>
+    <div class="step">
+      <div class="step-label"><span class="step-num">02</span><h3>Wood species</h3></div>
+      <div class="swatch-grid" id="speciesGrid"></div>
+    </div>
+    <div class="step">
+      <div class="step-label"><span class="step-num">03</span><h3>Panel profile</h3></div>
+      <div class="chip-grid" id="stickingGrid"></div>
+    </div>
+    <div class="step" id="glassStep">
+      <div class="step-label"><span class="step-num">04</span><h3>Glass</h3></div>
+      <p class="step-hint" id="glassHint"></p>
+      <div class="chip-grid" id="glassGrid"></div>
+    </div>
+    <div class="step">
+      <div class="step-label"><span class="step-num">05</span><h3>Size</h3></div>
+      <div class="row2">
+        <div class="field"><label for="widthSel">Width</label><select id="widthSel"></select></div>
+        <div class="field"><label for="heightSel">Height</label><select id="heightSel"></select></div>
+      </div>
+      <div class="row2" style="margin-top:8px">
+        <div class="field"><label for="thickSel">Thickness</label>
+          <select id="thickSel"><option value="1.375">1-3/8"</option><option value="1.75">1-3/4"</option></select>
+        </div>
+        <div class="field"><label for="finishSel">Finish</label>
+          <select id="finishSel"><option value="unf">Unfinished</option><option value="clear">Clear coat</option><option value="stain">Factory stain</option></select>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="stage" aria-label="Live door preview">
+    <div class="stage-tag">Live preview — <b id="stageDesc"></b></div>
+    <canvas id="doorCanvas" aria-label="Rendered door preview"></canvas>
+  </main>
+
+  <aside class="rail-right" aria-label="Specification and quote">
+    <div class="ticket">
+      <div class="ticket-head"><span class="t">Specification</span><span class="sku" id="skuOut">—</span></div>
+      <div class="ticket-body" id="specBody"></div>
+      <div class="price-line"><span class="k">Est. unit price</span><span class="v" id="priceOut">$0</span></div>
+      <div class="lead" id="leadOut"></div>
+    </div>
+    <button class="btn-primary" id="addBtn">Add to quote</button>
+    <div class="quote">
+      <h4>Quote draft <span class="count" id="quoteCount">0 items</span></h4>
+      <div id="quoteList"><div class="quote-empty">Configure a door and add it here to start a quote.</div></div>
+      <div class="quote-total" id="quoteTotalRow">
+        <span class="k">Quote total</span><span class="v" id="quoteTotal">$0</span>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  <span>CATALOG: 5,500 ITEMS · PRICING ILLUSTRATIVE</span>
+  <span class="ff">BUILT BY FARM FLOW DATA SOLUTIONS</span>
+</footer>
+
+<script>
+/* ============================================================
+   DATA
+============================================================ */
+const STYLES = [
+  {id:'2p',  code:'2P', name:'2-Panel Shaker', base:430, kind:'panel'},
+  {id:'3p',  code:'3P', name:'3-Panel',        base:465, kind:'panel'},
+  {id:'5p',  code:'5P', name:'5-Panel Equal',  base:510, kind:'panel'},
+  {id:'6p',  code:'6P', name:'6-Panel Colonial',base:540, kind:'panel'},
+  {id:'a2',  code:'A2', name:'Arch 2-Panel',   base:585, kind:'panel'},
+  {id:'hl',  code:'HL', name:'Half-Lite',      base:560, kind:'glass'},
+  {id:'f3',  code:'F3', name:'3-Lite French',  base:600, kind:'glass'},
+  {id:'f1',  code:'F1', name:'Full-Lite French',base:620, kind:'glass'},
+];
+const SPECIES = [
+  {id:'pg', code:'PG', name:'Paint-Grade', base:'#E8E2D4', mult:1.00, grainA:0.14, ringA:0, streak:0.15, knots:0},
+  {id:'ro', code:'RO', name:'Red Oak',     base:'#BE8756', mult:1.25, grainA:1.15, ringA:.8, streak:1.0, knots:0},
+  {id:'wo', code:'WO', name:'White Oak',   base:'#CBAE7F', mult:1.45, grainA:0.95, ringA:.7, streak:0.9, knots:0},
+  {id:'mp', code:'MP', name:'Maple',       base:'#E2CA9E', mult:1.30, grainA:0.45, ringA:.4, streak:0.5, knots:0},
+  {id:'ch', code:'CH', name:'Cherry',      base:'#93502E', mult:1.60, grainA:0.75, ringA:.6, streak:0.8, knots:0},
+  {id:'wa', code:'WA', name:'Walnut',      base:'#55402F', mult:1.85, grainA:1.05, ringA:.9, streak:1.1, knots:0},
+  {id:'ka', code:'KA', name:'Knotty Alder',base:'#B07A4D', mult:1.35, grainA:0.85, ringA:.7, streak:0.9, knots:3},
+  {id:'hi', code:'HI', name:'Hickory',     base:'#C09760', mult:1.40, grainA:1.0,  ringA:.8, streak:1.3, knots:1},
+];
+const STICKING = [
+  {id:'shaker', name:'Shaker', code:'SQUARE STICK', add:0},
+  {id:'ovolo',  name:'Ovolo Raised', code:'RAISED PANEL', add:65},
+  {id:'bead',   name:'Bead & Cove', code:'RAISED + BEAD', add:85},
+];
+const GLASS = [
+  {id:'clear',   name:'Clear',   code:'TEMPERED', add:120},
+  {id:'frosted', name:'Frosted', code:'SATIN ETCH', add:165},
+  {id:'seeded',  name:'Seeded',  code:'ARTISAN', add:195},
+  {id:'rain',    name:'Rain',    code:'TEXTURED', add:210},
+];
+const WIDTHS  = [24,28,30,32,34,36,42];
+const HEIGHTS = [80,84,96];
+const FINISH_ADD = {unf:0, clear:85, stain:145};
+const FINISH_NAME = {unf:'Unfinished', clear:'Clear coat', stain:'Factory stain'};
+
+const state = {style:'6p', species:'wa', sticking:'ovolo', glass:'clear', width:32, height:80, thick:'1.375', finish:'unf'};
+const quote = [];
+
+/* ============================================================
+   HELPERS
+============================================================ */
+const $=id=>document.getElementById(id);
+function hexRgb(hex){const n=parseInt(hex.slice(1),16);return [n>>16,(n>>8)&255,n&255]}
+function rgbHex(r,g,b){return '#'+((r<<16)|(g<<8)|b).toString(16).padStart(6,'0')}
+function shade(hex,amt){
+  let [r,g,b]=hexRgb(hex);
+  const t=amt<0?0:255, a=Math.abs(amt);
+  r=Math.round(r+(t-r)*a); g=Math.round(g+(t-g)*a); b=Math.round(b+(t-b)*a);
+  return rgbHex(r,g,b);
+}
+function rgba(hex,a){const [r,g,b]=hexRgb(hex);return `rgba(${r},${g},${b},${a})`}
+function seedFrom(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function mulberry(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296}}
+const money=n=>'$'+n.toLocaleString('en-US');
+function ftin(i){const f=Math.floor(i/12),r=i%12;return r?`${f}'-${r}"`:`${f}'-0"`}
+
+/* ============================================================
+   PRICING + SKU
+============================================================ */
+const curStyle=()=>STYLES.find(s=>s.id===state.style);
+const curSpecies=()=>SPECIES.find(s=>s.id===state.species);
+function calc(){
+  const st=curStyle(), sp=curSpecies();
+  let p = st.base*sp.mult + STICKING.find(s=>s.id===state.sticking).add;
+  if(st.kind==='glass') p += GLASS.find(g=>g.id===state.glass).add;
+  if(state.width>36) p*=1.08;
+  if(state.height===84) p*=1.05;
+  if(state.height===96) p*=1.15;
+  if(state.thick==='1.75') p*=1.12;
+  p += FINISH_ADD[state.finish];
+  return Math.round(p/5)*5;
+}
+function sku(){
+  const st=curStyle(), sp=curSpecies();
+  return `CI-${st.code}-${sp.code}-${state.width}${state.height}`;
+}
+const leadTime=()=> state.finish==='unf' ? 'Est. lead time: 10–12 business days' : 'Est. lead time: 15–18 business days (finished)';
+
+/* ============================================================
+   DOOR GEOMETRY  (inches)
+============================================================ */
+function layout(){
+  const W=state.width, H=state.height;
+  const stile=4.75, topR=4.75, botR=9.0, midR=6.5, mull=4.75;
+  const ix=stile, iw=W-2*stile, iy=topR, ih=H-topR-botR;
+  const st=curStyle();
+  const openings=[], rails=[], mullions=[];
+  rails.push({x:ix,y:0,w:iw,h:topR});
+  rails.push({x:ix,y:H-botR,w:iw,h:botR});
+
+  const stack=(fracs,type)=>{
+    const gaps=(fracs.length-1)*midR, avail=ih-gaps;
+    let y=iy;
+    fracs.forEach((f,i)=>{
+      const h=avail*f;
+      openings.push({x:ix,y,w:iw,h,t:type});
+      if(i<fracs.length-1) rails.push({x:ix,y:y+h,w:iw,h:midR});
+      y+=h+midR;
+    });
+  };
+
+  if(st.id==='2p') stack([.34,.66],'panel');
+  else if(st.id==='3p') stack([1/3,1/3,1/3],'panel');
+  else if(st.id==='5p') stack([.2,.2,.2,.2,.2],'panel');
+  else if(st.id==='6p'){
+    const cw=(iw-mull)/2, fr=[.22,.39,.39], gaps=2*midR, avail=ih-gaps;
+    let y=iy;
+    fr.forEach((f,i)=>{
+      const h=avail*f;
+      openings.push({x:ix,y,w:cw,h,t:'panel'});
+      openings.push({x:ix+cw+mull,y,w:cw,h,t:'panel'});
+      mullions.push({x:ix+cw,y,w:mull,h});
+      if(i<2) rails.push({x:ix,y:y+h,w:iw,h:midR});
+      y+=h+midR;
+    });
+  }
+  else if(st.id==='a2'){
+    const gaps=midR, avail=ih-gaps, h1=avail*.36;
+    openings.push({x:ix,y:iy,w:iw,h:h1,t:'panel',arch:true});
+    rails.push({x:ix,y:iy+h1,w:iw,h:midR});
+    openings.push({x:ix,y:iy+h1+midR,w:iw,h:avail-h1,t:'panel'});
+  }
+  else if(st.id==='hl'){
+    const gaps=midR, avail=ih-gaps, g=avail*.52;
+    openings.push({x:ix,y:iy,w:iw,h:g,t:'glass'});
+    rails.push({x:ix,y:iy+g,w:iw,h:midR});
+    openings.push({x:ix,y:iy+g+midR,w:iw,h:avail-g,t:'panel'});
+  }
+  else if(st.id==='f3') stack([1/3,1/3,1/3],'glass');
+  else if(st.id==='f1') stack([1],'glass');
+  return {openings,rails,mullions,stile};
+}
+
+/* ============================================================
+   WOOD PAINTER
+   dir 'v' = grain runs vertically, 'h' = horizontally
+============================================================ */
+function paintWood(ctx,x,y,w,h,sp,dir,seedStr,tone=0){
+  const stainTone = state.finish==='stain' ? -0.06 : 0;
+  tone += stainTone;
+  const base = shade(sp.base, tone);
+  const grainC = shade(sp.base, -0.5 + tone*0.5);
+  const lightC = shade(sp.base, 0.45);
+  ctx.save();
+  ctx.beginPath(); ctx.rect(x,y,w,h); ctx.clip();
+
+  // base with soft cross-grain gradient
+  const g = dir==='v'
+    ? ctx.createLinearGradient(x,y,x+w,y)
+    : ctx.createLinearGradient(x,y,x,y+h);
+  g.addColorStop(0, shade(base,.045));
+  g.addColorStop(.5, base);
+  g.addColorStop(1, shade(base,-.05));
+  ctx.fillStyle=g; ctx.fillRect(x,y,w,h);
+
+  const R = mulberry(seedFrom(seedStr));
+  const across = dir==='v'? w : h;
+  const along  = dir==='v'? h : w;
+
+  // broad tonal bands (heartwood/sapwood variation)
+  const bands = 2 + Math.floor(R()*3);
+  for(let i=0;i<bands;i++){
+    const p = R()*across, bw = 10+R()*34;
+    const dark = R()>0.4;
+    const a = (0.035+R()*0.05)*sp.streak;
+    ctx.fillStyle = dark? rgba(grainC,a) : rgba(lightC,a*.8);
+    if(dir==='v') ctx.fillRect(x+p, y, bw, h);
+    else ctx.fillRect(x, y+p, w, bw);
+  }
+
+  // grain lines
+  let p = 1 + R()*3;
+  while(p < across){
+    const amp  = 0.8 + R()*2.4;
+    const f    = 0.006 + R()*0.014;
+    const ph   = R()*Math.PI*2;
+    const amp2 = R()*0.9, f2 = 0.04+R()*0.05, ph2=R()*6;
+    const a    = (0.045 + R()*0.11)*sp.grainA;
+    const lw   = 0.5 + R()*1.15;
+    const isLight = R()<0.16;
+    ctx.strokeStyle = isLight? rgba(lightC, a*0.9) : rgba(grainC, a);
+    ctx.lineWidth = lw;
+    ctx.beginPath();
+    for(let t=0;t<=along;t+=7){
+      const off = amp*Math.sin(t*f+ph) + amp2*Math.sin(t*f2+ph2);
+      const xx = dir==='v'? x+p+off : x+t;
+      const yy = dir==='v'? y+t     : y+p+off;
+      t===0? ctx.moveTo(xx,yy) : ctx.lineTo(xx,yy);
+    }
+    ctx.stroke();
+    // occasional tight pair (ring edge)
+    if(R()<0.22*sp.ringA){
+      p += 1.2;
+    } else {
+      p += 2.2 + R()*4.2;
+    }
+  }
+
+  // knots
+  const nk = sp.knots ? Math.floor(R()*sp.knots)+ (sp.id==='ka'?1:0) : 0;
+  for(let i=0;i<nk;i++){
+    const kx=x+8+R()*(Math.max(w-16,1)), ky=y+8+R()*(Math.max(h-16,1));
+    const kr=2.5+R()*4;
+    const kg=ctx.createRadialGradient(kx,ky,0,kx,ky,kr*2.6);
+    kg.addColorStop(0, rgba(shade(sp.base,-.62),.85));
+    kg.addColorStop(.45, rgba(shade(sp.base,-.45),.5));
+    kg.addColorStop(1, rgba(shade(sp.base,-.3),0));
+    ctx.fillStyle=kg;
+    ctx.beginPath(); ctx.ellipse(kx,ky,kr*2.6,kr*1.8,R(),0,7); ctx.fill();
+    ctx.strokeStyle=rgba(shade(sp.base,-.55),.5); ctx.lineWidth=.8;
+    ctx.beginPath(); ctx.ellipse(kx,ky,kr,kr*.72,R(),0,7); ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+/* joint hairline */
+function jointLines(ctx, rects){
+  ctx.save();
+  ctx.strokeStyle='rgba(20,10,0,.14)'; ctx.lineWidth=1;
+  rects.forEach(r=>ctx.strokeRect(r.x+.5,r.y+.5,r.w-1,r.h-1));
+  ctx.restore();
+}
+
+/* inner shadow inside a rect (recess) */
+function innerShadow(ctx,x,y,w,h,depth,alpha){
+  ctx.save();
+  let g=ctx.createLinearGradient(0,y,0,y+depth);
+  g.addColorStop(0,`rgba(15,8,0,${alpha})`); g.addColorStop(1,'rgba(15,8,0,0)');
+  ctx.fillStyle=g; ctx.fillRect(x,y,w,depth);
+  g=ctx.createLinearGradient(x,0,x+depth,0);
+  g.addColorStop(0,`rgba(15,8,0,${alpha*.75})`); g.addColorStop(1,'rgba(15,8,0,0)');
+  ctx.fillStyle=g; ctx.fillRect(x,y,depth,h);
+  g=ctx.createLinearGradient(x+w-depth,0,x+w,0);
+  g.addColorStop(0,'rgba(15,8,0,0)'); g.addColorStop(1,`rgba(15,8,0,${alpha*.55})`);
+  ctx.fillStyle=g; ctx.fillRect(x+w-depth,y,depth,h);
+  g=ctx.createLinearGradient(0,y+h-depth,0,y+h);
+  g.addColorStop(0,'rgba(255,250,235,0)'); g.addColorStop(1,`rgba(255,250,235,${alpha*.5})`);
+  ctx.fillStyle=g; ctx.fillRect(x,y+h-depth,w,depth);
+  ctx.restore();
+}
+
+/* sticking moulding around an opening */
+function sticking(ctx,x,y,w,h){
+  ctx.save();
+  ctx.strokeStyle='rgba(15,8,0,.38)'; ctx.lineWidth=1.4;
+  ctx.strokeRect(x+.7,y+.7,w-1.4,h-1.4);
+  ctx.strokeStyle='rgba(255,248,230,.28)'; ctx.lineWidth=1;
+  ctx.strokeRect(x+2.4,y+2.4,w-4.8,h-4.8);
+  if(state.sticking!=='shaker'){
+    ctx.strokeStyle='rgba(15,8,0,.20)'; ctx.lineWidth=1;
+    ctx.strokeRect(x+4.2,y+4.2,w-8.4,h-8.4);
+  }
+  ctx.restore();
+}
+
+/* raised-panel bevel frame */
+function bevel(ctx,x,y,w,h,bv,sp,tone){
+  const lite='rgba(255,250,235,', dark='rgba(20,10,0,';
+  // top
+  let g=ctx.createLinearGradient(0,y,0,y+bv);
+  g.addColorStop(0,lite+'0.30)'); g.addColorStop(1,lite+'0)');
+  ctx.fillStyle=g;
+  ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w,y);ctx.lineTo(x+w-bv,y+bv);ctx.lineTo(x+bv,y+bv);ctx.closePath();ctx.fill();
+  // left
+  g=ctx.createLinearGradient(x,0,x+bv,0);
+  g.addColorStop(0,lite+'0.14)'); g.addColorStop(1,lite+'0)');
+  ctx.fillStyle=g;
+  ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+bv,y+bv);ctx.lineTo(x+bv,y+h-bv);ctx.lineTo(x,y+h);ctx.closePath();ctx.fill();
+  // right
+  g=ctx.createLinearGradient(x+w-bv,0,x+w,0);
+  g.addColorStop(0,dark+'0)'); g.addColorStop(1,dark+'0.20)');
+  ctx.fillStyle=g;
+  ctx.beginPath();ctx.moveTo(x+w,y);ctx.lineTo(x+w,y+h);ctx.lineTo(x+w-bv,y+h-bv);ctx.lineTo(x+w-bv,y+bv);ctx.closePath();ctx.fill();
+  // bottom
+  g=ctx.createLinearGradient(0,y+h-bv,0,y+h);
+  g.addColorStop(0,dark+'0)'); g.addColorStop(1,dark+'0.30)');
+  ctx.fillStyle=g;
+  ctx.beginPath();ctx.moveTo(x,y+h);ctx.lineTo(x+bv,y+h-bv);ctx.lineTo(x+w-bv,y+h-bv);ctx.lineTo(x+w,y+h);ctx.closePath();ctx.fill();
+}
+
+/* ============================================================
+   GLASS PAINTER
+============================================================ */
+function paintGlass(ctx,x,y,w,h,seedStr){
+  const R=mulberry(seedFrom(seedStr));
+  ctx.save();
+  ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+
+  const kind=state.glass;
+  let g=ctx.createLinearGradient(x,y,x+w,y+h);
+  if(kind==='frosted'){
+    g.addColorStop(0,'#ECF0EE'); g.addColorStop(.5,'#E0E7E4'); g.addColorStop(1,'#E9EEEC');
+  } else {
+    g.addColorStop(0,'#C9DCE3'); g.addColorStop(.42,'#AEC6CF');
+    g.addColorStop(.55,'#DCEBEF'); g.addColorStop(1,'#B4C9D1');
+  }
+  ctx.fillStyle=g; ctx.fillRect(x,y,w,h);
+
+  if(kind==='seeded'){
+    const n = (w*h)/650;
+    for(let i=0;i<n;i++){
+      const bx=x+R()*w, by=y+R()*h, r=0.7+R()*1.8;
+      ctx.strokeStyle=`rgba(90,120,125,${0.18+R()*0.2})`; ctx.lineWidth=.8;
+      ctx.beginPath();ctx.arc(bx,by,r,0,7);ctx.stroke();
+      ctx.fillStyle='rgba(255,255,255,.35)';
+      ctx.beginPath();ctx.arc(bx-r*.3,by-r*.3,r*.3,0,7);ctx.fill();
+    }
+  }
+  if(kind==='rain'){
+    for(let px=x+3+R()*6; px<x+w; px+=6+R()*7){
+      ctx.strokeStyle=`rgba(120,150,155,${0.22+R()*0.18})`;
+      ctx.lineWidth=1.6+R()*1.6;
+      ctx.beginPath();
+      const a=2+R()*3, f=0.05+R()*0.04, ph=R()*6;
+      for(let t=0;t<=h;t+=6){
+        const xx=px+a*Math.sin(t*f+ph);
+        t===0?ctx.moveTo(xx,y):ctx.lineTo(xx,y+t);
+      }
+      ctx.stroke();
+    }
+    ctx.fillStyle='rgba(255,255,255,.06)';ctx.fillRect(x,y,w,h);
+  }
+  if(kind==='frosted'){
+    for(let i=0;i<(w*h)/300;i++){
+      ctx.fillStyle=`rgba(255,255,255,${0.03+R()*0.05})`;
+      ctx.fillRect(x+R()*w, y+R()*h, 1+R()*2, 1+R()*2);
+    }
+  }
+
+  // window reflection (skip on frosted)
+  if(kind!=='frosted'){
+    ctx.fillStyle='rgba(255,255,255,.20)';
+    ctx.beginPath();
+    ctx.moveTo(x+w*.10,y+h); ctx.lineTo(x+w*.34,y); ctx.lineTo(x+w*.46,y); ctx.lineTo(x+w*.22,y+h);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.10)';
+    ctx.beginPath();
+    ctx.moveTo(x+w*.52,y+h); ctx.lineTo(x+w*.76,y); ctx.lineTo(x+w*.83,y); ctx.lineTo(x+w*.59,y+h);
+    ctx.closePath(); ctx.fill();
+  }
+
+  innerShadow(ctx,x,y,w,h,7,.30);
+  ctx.restore();
+  ctx.strokeStyle='rgba(15,8,0,.4)';ctx.lineWidth=1;ctx.strokeRect(x+.5,y+.5,w-1,h-1);
+}
+
+/* ============================================================
+   MAIN RENDER
+============================================================ */
+function renderDoor(){
+  const sp=curSpecies(), st=curStyle();
+  const W=state.width, H=state.height;
+  const S=6.4;
+  const dw=W*S, dh=H*S;
+  const padL=88, padR=52, padT=30, padB=76;
+  const cw=dw+padL+padR, chh=dh+padT+padB;
+
+  const canvas=$('doorCanvas');
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  canvas.width=cw*dpr; canvas.height=chh*dpr;
+  const maxH = Math.min(640, window.innerHeight-220);
+  const scale = Math.min(1, maxH/chh);
+  canvas.style.width = (cw*scale)+'px';
+  canvas.style.height = (chh*scale)+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,cw,chh);
+
+  const L=layout();
+  const X=v=>padL+v*S, Y=v=>padT+v*S, Sc=v=>v*S;
+  const seedBase=`${sp.id}-${st.id}-${W}x${H}`;
+
+  /* floor contact shadow */
+  ctx.fillStyle='rgba(60,40,18,.18)';
+  ctx.beginPath();
+  ctx.ellipse(padL+dw/2, padT+dh+9, dw*0.60, 11, 0, 0, 7);
+  ctx.fill();
+
+  /* cast shadow behind slab */
+  ctx.save();
+  ctx.shadowColor='rgba(55,36,15,.38)';
+  ctx.shadowBlur=26; ctx.shadowOffsetX=10; ctx.shadowOffsetY=16;
+  ctx.fillStyle=sp.base;
+  ctx.fillRect(padL,padT,dw,dh);
+  ctx.restore();
+
+  /* slab edge (thickness) */
+  const edgeW = state.thick==='1.75' ? 9 : 7;
+  let eg=ctx.createLinearGradient(padL+dw,0,padL+dw+edgeW,0);
+  eg.addColorStop(0,shade(sp.base,-.38)); eg.addColorStop(1,shade(sp.base,-.55));
+  ctx.fillStyle=eg;
+  ctx.beginPath();
+  ctx.moveTo(padL+dw,padT); ctx.lineTo(padL+dw+edgeW,padT+4);
+  ctx.lineTo(padL+dw+edgeW,padT+dh+4); ctx.lineTo(padL+dw,padT+dh);
+  ctx.closePath(); ctx.fill();
+
+  /* ---- stiles (vertical grain, full height) ---- */
+  const stW=Sc(L.stile);
+  paintWood(ctx, padL, padT, stW, dh, sp, 'v', seedBase+'-stileL');
+  paintWood(ctx, padL+dw-stW, padT, stW, dh, sp, 'v', seedBase+'-stileR');
+  /* field behind openings (so arch spandrels are wood) */
+  paintWood(ctx, padL+stW, padT, dw-2*stW, dh, sp, 'v', seedBase+'-field', -0.01);
+
+  /* ---- rails (horizontal grain) ---- */
+  const railRects=[];
+  L.rails.forEach((r,i)=>{
+    const rr={x:X(r.x),y:Y(r.y),w:Sc(r.w),h:Sc(r.h)};
+    paintWood(ctx, rr.x, rr.y, rr.w, rr.h, sp, 'h', seedBase+'-rail'+i, 0.012);
+    railRects.push(rr);
+  });
+  /* ---- mullions (vertical grain) ---- */
+  L.mullions.forEach((m,i)=>{
+    const mr={x:X(m.x),y:Y(m.y),w:Sc(m.w),h:Sc(m.h)};
+    paintWood(ctx, mr.x, mr.y, mr.w, mr.h, sp, 'v', seedBase+'-mull'+i, 0.008);
+    railRects.push(mr);
+  });
+  jointLines(ctx, railRects);
+
+  /* ---- openings ---- */
+  L.openings.forEach((o,i)=>{
+    const ox=X(o.x), oy=Y(o.y), ow=Sc(o.w), oh=Sc(o.h);
+
+    if(o.arch){
+      const rise=Math.min(oh*.42, ow*.26);
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(ox, oy+rise);
+      ctx.quadraticCurveTo(ox+ow/2, oy-rise*.55, ox+ow, oy+rise);
+      ctx.lineTo(ox+ow, oy+oh); ctx.lineTo(ox, oy+oh); ctx.closePath();
+      ctx.clip();
+      drawPanelBody(ctx, ox, oy, ow, oh, sp, seedBase+'-p'+i);
+      ctx.restore();
+      /* arch mould */
+      ctx.strokeStyle='rgba(15,8,0,.38)';ctx.lineWidth=1.4;
+      ctx.beginPath();
+      ctx.moveTo(ox,oy+rise);ctx.quadraticCurveTo(ox+ow/2,oy-rise*.55,ox+ow,oy+rise);
+      ctx.lineTo(ox+ow,oy+oh);ctx.lineTo(ox,oy+oh);ctx.closePath();ctx.stroke();
+      ctx.strokeStyle='rgba(255,248,230,.26)';ctx.lineWidth=1;
+      ctx.beginPath();
+      ctx.moveTo(ox+2.4,oy+rise+1.4);ctx.quadraticCurveTo(ox+ow/2,oy-rise*.5+2.6,ox+ow-2.4,oy+rise+1.4);
+      ctx.stroke();
+      return;
+    }
+
+    if(o.t==='glass'){
+      paintGlass(ctx, ox+3, oy+3, ow-6, oh-6, seedBase+'-g'+i);
+      sticking(ctx, ox, oy, ow, oh);
+      return;
+    }
+
+    drawPanelBody(ctx, ox, oy, ow, oh, sp, seedBase+'-p'+i);
+    sticking(ctx, ox, oy, ow, oh);
+  });
+
+  function drawPanelBody(ctx,ox,oy,ow,oh,sp,seed){
+    if(state.sticking==='shaker'){
+      paintWood(ctx, ox, oy, ow, oh, sp, 'v', seed, -0.075);
+      innerShadow(ctx, ox, oy, ow, oh, 10, .30);
+      return;
+    }
+    /* raised panel */
+    const bv=Math.max(8, Math.min(15, ow*.11, oh*.16));
+    paintWood(ctx, ox, oy, ow, oh, sp, 'v', seed+'-bev', -0.03);
+    innerShadow(ctx, ox, oy, ow, oh, 8, .26);
+    bevel(ctx, ox+3, oy+3, ow-6, oh-6, bv, sp);
+    const fx=ox+3+bv, fy=oy+3+bv, fw=ow-6-2*bv, fh=oh-6-2*bv;
+    paintWood(ctx, fx, fy, fw, fh, sp, 'v', seed+'-field', 0.055);
+    ctx.strokeStyle='rgba(15,8,0,.30)';ctx.lineWidth=1;
+    ctx.strokeRect(fx+.5,fy+.5,fw-1,fh-1);
+    ctx.strokeStyle='rgba(255,250,235,.22)';ctx.lineWidth=1;
+    ctx.strokeRect(fx+1.5,fy+1.5,fw-3,fh-3);
+    if(state.sticking==='bead'){
+      ctx.strokeStyle='rgba(255,250,235,.32)';ctx.lineWidth=1.2;
+      ctx.strokeRect(fx+4,fy+4,fw-8,fh-8);
+      ctx.strokeStyle='rgba(15,8,0,.18)';ctx.lineWidth=1;
+      ctx.strokeRect(fx+5.5,fy+5.5,fw-11,fh-11);
+    }
+  }
+
+  /* ---- global lighting ---- */
+  let lg=ctx.createLinearGradient(padL,0,padL+dw,0);
+  lg.addColorStop(0,'rgba(255,252,240,.10)');
+  lg.addColorStop(.45,'rgba(255,252,240,0)');
+  lg.addColorStop(1,'rgba(20,10,0,.12)');
+  ctx.fillStyle=lg; ctx.fillRect(padL,padT,dw,dh);
+  lg=ctx.createLinearGradient(0,padT,0,padT+dh);
+  lg.addColorStop(0,'rgba(255,252,240,.07)');
+  lg.addColorStop(.25,'rgba(255,252,240,0)');
+  lg.addColorStop(.9,'rgba(20,10,0,.05)');
+  ctx.fillStyle=lg; ctx.fillRect(padL,padT,dw,dh);
+
+  /* finish sheen */
+  if(state.finish!=='unf'){
+    ctx.save();
+    ctx.beginPath();ctx.rect(padL,padT,dw,dh);ctx.clip();
+    ctx.fillStyle='rgba(255,255,250,.075)';
+    ctx.beginPath();
+    ctx.moveTo(padL+dw*.05,padT+dh);ctx.lineTo(padL+dw*.42,padT);
+    ctx.lineTo(padL+dw*.56,padT);ctx.lineTo(padL+dw*.19,padT+dh);
+    ctx.closePath();ctx.fill();
+    ctx.restore();
+  }
+
+  /* slab outline + edge AO */
+  ctx.strokeStyle='rgba(15,8,0,.5)'; ctx.lineWidth=1.6;
+  ctx.strokeRect(padL+.8,padT+.8,dw-1.6,dh-1.6);
+  ctx.strokeStyle='rgba(15,8,0,.12)'; ctx.lineWidth=4;
+  ctx.strokeRect(padL+2.8,padT+2.8,dw-5.6,dh-5.6);
+
+  /* ---- hardware: brass knob + rosette ---- */
+  const kx=padL+dw-Sc(2.6), ky=padT+dh*.52;
+  ctx.fillStyle='rgba(20,10,0,.3)';
+  ctx.beginPath();ctx.ellipse(kx+2.5,ky+3.5,10.5,10,0,0,7);ctx.fill();
+  let rg=ctx.createRadialGradient(kx-1,ky-1,1,kx,ky,13);
+  rg.addColorStop(0,'#8A6a34');rg.addColorStop(1,'#4E3812');
+  ctx.fillStyle=rg;ctx.beginPath();ctx.arc(kx,ky,12,0,7);ctx.fill();
+  rg=ctx.createRadialGradient(kx-3,ky-3.5,1,kx,ky,9);
+  rg.addColorStop(0,'#F2D28C');rg.addColorStop(.55,'#C89B4B');rg.addColorStop(1,'#7A5A22');
+  ctx.fillStyle=rg;ctx.beginPath();ctx.arc(kx,ky,8.6,0,7);ctx.fill();
+  ctx.fillStyle='rgba(255,245,220,.85)';
+  ctx.beginPath();ctx.ellipse(kx-2.8,ky-3.2,2.4,1.6,-.6,0,7);ctx.fill();
+
+  /* ---- dimension lines ---- */
+  const dimC='#8C7A62';
+  ctx.strokeStyle=dimC; ctx.fillStyle=dimC; ctx.lineWidth=1;
+  ctx.font="12.5px 'IBM Plex Mono', monospace";
+  ctx.beginPath();
+  ctx.moveTo(padL-30,padT);ctx.lineTo(padL-30,padT+dh);
+  ctx.moveTo(padL-36,padT);ctx.lineTo(padL-8,padT);
+  ctx.moveTo(padL-36,padT+dh);ctx.lineTo(padL-8,padT+dh);
+  ctx.stroke();
+  ctx.save();
+  ctx.translate(padL-40,padT+dh/2);ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center';ctx.fillText(ftin(H),0,0);
+  ctx.restore();
+  ctx.beginPath();
+  ctx.moveTo(padL,padT+dh+30);ctx.lineTo(padL+dw,padT+dh+30);
+  ctx.moveTo(padL,padT+dh+24);ctx.lineTo(padL,padT+dh+36);
+  ctx.moveTo(padL+dw,padT+dh+24);ctx.lineTo(padL+dw,padT+dh+36);
+  ctx.stroke();
+  ctx.textAlign='center';
+  ctx.fillText(`${ftin(W)} × ${state.thick==='1.75'?'1-3/4"':'1-3/8"'}`, padL+dw/2, padT+dh+52);
+}
+
+/* ============================================================
+   UI
+============================================================ */
+function buildControls(){
+  $('styleGrid').innerHTML = STYLES.map(s=>
+    `<button class="chip" data-k="style" data-v="${s.id}">${s.name}<span class="code">${s.code} · from $${s.base}</span></button>`).join('');
+  $('speciesGrid').innerHTML = SPECIES.map(s=>
+    `<button class="swatch" data-k="species" data-v="${s.id}" aria-label="${s.name}">
+       <span class="wood" style="background:linear-gradient(160deg, ${shade(s.base,.08)}, ${s.base} 55%, ${shade(s.base,-.12)})"></span>
+       <span class="name">${s.name}</span></button>`).join('');
+  $('stickingGrid').innerHTML = STICKING.map(s=>
+    `<button class="chip" data-k="sticking" data-v="${s.id}">${s.name}<span class="code">${s.code}${s.add?` · +$${s.add}`:''}</span></button>`).join('');
+  $('glassGrid').innerHTML = GLASS.map(g=>
+    `<button class="chip" data-k="glass" data-v="${g.id}">${g.name}<span class="code">${g.code} · +$${g.add}</span></button>`).join('');
+  $('widthSel').innerHTML = WIDTHS.map(w=>`<option value="${w}">${ftin(w)} (${w}")</option>`).join('');
+  $('heightSel').innerHTML = HEIGHTS.map(h=>`<option value="${h}">${ftin(h)} (${h}")</option>`).join('');
+  $('widthSel').value=state.width; $('heightSel').value=state.height;
+}
+function syncControls(){
+  document.querySelectorAll('[data-k]').forEach(el=>{
+    el.classList.toggle('active', state[el.dataset.k]===el.dataset.v);
+  });
+  const hasGlass = curStyle().kind==='glass';
+  document.querySelectorAll('#glassGrid .chip').forEach(c=>c.disabled=!hasGlass);
+  $('glassHint').textContent = hasGlass
+    ? 'Tempered safety glass, factory glazed.'
+    : 'Select a lite style (Half-Lite, 3-Lite, Full-Lite) to enable glass.';
+}
+function renderSpec(){
+  const st=curStyle(), sp=curSpecies();
+  const rows=[['Style',st.name],['Species',sp.name],['Profile',STICKING.find(s=>s.id===state.sticking).name]];
+  if(st.kind==='glass') rows.push(['Glass',GLASS.find(g=>g.id===state.glass).name+' tempered']);
+  rows.push(['Size',`${ftin(state.width)} × ${ftin(state.height)}`]);
+  rows.push(['Thickness',state.thick==='1.75'?'1-3/4"':'1-3/8"']);
+  rows.push(['Finish',FINISH_NAME[state.finish]]);
+  $('specBody').innerHTML = rows.map(r=>`<div class="spec-row"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join('');
+  $('skuOut').textContent=sku();
+  $('priceOut').textContent=money(calc());
+  $('leadOut').textContent=leadTime();
+  $('stageDesc').textContent=`${st.name} · ${sp.name}`;
+}
+function renderQuote(){
+  $('quoteCount').textContent=`${quote.length} item${quote.length===1?'':'s'}`;
+  if(!quote.length){
+    $('quoteList').innerHTML='<div class="quote-empty">Configure a door and add it here to start a quote.</div>';
+    $('quoteTotalRow').style.display='none';return;
+  }
+  $('quoteList').innerHTML=quote.map((q,i)=>
+    `<div class="quote-item"><div><div class="qi-sku">${q.sku}</div><div class="qi-desc">${q.desc}</div></div>
+     <span class="qi-price">${money(q.price)}</span>
+     <button class="qi-remove" data-i="${i}" aria-label="Remove ${q.sku}">×</button></div>`).join('');
+  $('quoteTotal').textContent=money(quote.reduce((a,b)=>a+b.price,0));
+  $('quoteTotalRow').style.display='flex';
+}
+function refresh(){syncControls();renderDoor();renderSpec()}
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-k]');
+  if(t && !t.disabled){state[t.dataset.k]=t.dataset.v;refresh();return}
+  const r=e.target.closest('.qi-remove');
+  if(r){quote.splice(+r.dataset.i,1);renderQuote()}
+});
+$('widthSel').addEventListener('change',e=>{state.width=+e.target.value;refresh()});
+$('heightSel').addEventListener('change',e=>{state.height=+e.target.value;refresh()});
+$('thickSel').addEventListener('change',e=>{state.thick=e.target.value;refresh()});
+$('finishSel').addEventListener('change',e=>{state.finish=e.target.value;refresh()});
+$('addBtn').addEventListener('click',()=>{
+  quote.push({sku:sku(),desc:`${curStyle().name}, ${curSpecies().name}, ${ftin(state.width)}×${ftin(state.height)}`,price:calc()});
+  renderQuote();
+});
+window.addEventListener('resize',()=>renderDoor());
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>renderDoor());
+
+buildControls();refresh();renderQuote();
+</script>
+</body>
+</html>
